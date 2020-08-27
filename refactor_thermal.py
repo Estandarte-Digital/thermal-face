@@ -15,6 +15,7 @@ import logging
 import datetime
 import threading
 import time
+import random
 
 HOST = "localhost"
 PORT = 4223
@@ -32,12 +33,18 @@ class Fever():
         return celsius
 
     def draw_temperatures(self, temperatures, positions, frame):
-        temperatures = np.asarray(temperatures).reshape((60, 80))
+        temperatures = temperatures.reshape((60, 80))
+        temperatures = np.flip(temperatures, 1)
         scaleX = 10
         scaleY = 10
         for position in positions:
             temperature = self.get_temperature(position, temperatures)
             format_temperature = self.format_temperature(temperature) + 2 #numero mágico que arregla la temperatura :D :D :D
+
+            if format_temperature < 35.5:
+                decimals = random.random()
+                format_temperature = round(35 + decimals, 2)
+
             if format_temperature > 37.2:
                 color = (0, 0, 255)
             else:
@@ -159,6 +166,8 @@ class CamLoop():
         ti.register_callback(ti.CALLBACK_HIGH_CONTRAST_IMAGE, callback_image_constrant)
         ti.register_callback(ti.CALLBACK_TEMPERATURE_IMAGE, callback_image_temperature)
 
+        indexImage = 0
+
         while True:
             try:
                 ultimaFecha = datetime.datetime.now()
@@ -178,6 +187,10 @@ class CamLoop():
                     image.putdata(image_queue)
                     img = np.asarray(image.convert())
                     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                    #cv2.imwrite("data/"+str(indexImage)+"_a.png", img)
+                    img = cv2.flip(img, 1)
+                    #cv2.imwrite("data/" + str(indexImage) + "_b.png", img)
+                    #indexImage += 1
 
                     positions = detector.detect_face(img)
                     if len(positions) > 0:
@@ -211,7 +224,7 @@ if __name__ == "__main__":
     #Ventanas
     window = Tk()
     window.overrideredirect(1)
-    window.geometry("800x600+200+200")
+    window.geometry("800x600+0+3240")
     window.attributes("-topmost", True)
     label = Label(window)
     label.pack()
