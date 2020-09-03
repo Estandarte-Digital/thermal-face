@@ -33,6 +33,7 @@ class Fever():
         return celsius
 
     def draw_temperatures(self, temperatures, positions, frame):
+        temperatures = np.asarray(temperatures)
         temperatures = temperatures.reshape((60, 80))
         temperatures = np.flip(temperatures, 1)
         scaleX = 10
@@ -50,8 +51,6 @@ class Fever():
             else:
                 color = (10, 255, 0)
             temperature = '{0:.2f}'.format(format_temperature)
-            if temperature[0] == '-':
-                temperature = ''
 
             frame = cv2.resize(frame, (800, 600))
 
@@ -173,10 +172,10 @@ class CamLoop():
                 ultimaFecha = datetime.datetime.now()
                 ti.set_image_transfer_config(ti.IMAGE_TRANSFER_CALLBACK_HIGH_CONTRAST_IMAGE)
                 image_queue = images_queues.get(True)
-                logging.debug(image_queue)
+                #logging.debug(image_queue)
                 ti.set_image_transfer_config(ti.IMAGE_TRANSFER_CALLBACK_TEMPERATURE_IMAGE)
                 temperatures = temperatures_queues.get(True)
-                logging.debug(temperatures)
+                #logging.debug(temperatures)
                 ti.set_image_transfer_config(ti.IMAGE_TRANSFER_MANUAL_HIGH_CONTRAST_IMAGE)
 
                 with images_queues.mutex as iq, temperatures_queues.mutex as tq:
@@ -205,15 +204,16 @@ class CamLoop():
             except Exception as ex:
                 print(ex)
             finally:
-                logging.debug("Main: Ventana actualizada")
+                # logging.debug("Main: Ventana actualizada")
+                pass
 
 if __name__ == "__main__":
     #Logging
     date = datetime.datetime.now()
-    namelogin = "./logs/{}{}{}{}{}{}.log".format(date.day, date.month, date.year, date.hour, date.minute, date.second)
-    f = open(namelogin,'w+')
-    f.close()
-    logging.basicConfig(filename=namelogin, level=logging.DEBUG)
+    #namelogin = "./logs/{}{}{}{}{}{}.log".format(date.day, date.month, date.year, date.hour, date.minute, date.second)
+    #f = open(namelogin,'w+')
+    #f.close()
+    #logging.basicConfig(filename=namelogin, level=logging.DEBUG)
 
     #Objetos
     detector = Detector()
@@ -238,6 +238,8 @@ if __name__ == "__main__":
 
     #Loop controlado
     lanzar_thread(CamLoop())
+
+    print("FEVER LANZADO!!!")
 
     #Actualizaciones de las ventanas
     while True:
