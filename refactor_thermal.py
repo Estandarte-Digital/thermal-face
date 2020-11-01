@@ -106,6 +106,48 @@ class Detector:
 
         return positions
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def get_thermal_image_color_palette():
     palette = []
 
@@ -185,6 +227,7 @@ class CamLoop():
                 if image_queue is not None:
                     image.putdata(image_queue)
                     img = np.asarray(image.convert())
+                    img = cv2.rotate(img, cv2.ROTATE_180)
                     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                     #cv2.imwrite("data/"+str(indexImage)+"_a.png", img)
                     img = cv2.flip(img, 1)
